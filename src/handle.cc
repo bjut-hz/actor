@@ -2,18 +2,18 @@
 
 namespace Actor {
 	namespace HandleService {
-		using Store = std::map<Handle, Service>;
+		using Store = std::map<Handle, std::shared_ptr<MessageQueue>>;
 
 		static std::mutex mu;
 		static Store g_handle_store;
 
 		Handle NewHandle() {
-			static std::atomic<Handle> base = 0;
+			static std::atomic<Handle> base{0};
 			base.store(base + 1);
 			return base.load();
 		}
 
-		bool Register(Handle handle, Service service) {
+		bool Register(Handle handle, std::shared_ptr<MessageQueue> service) {
 			std::lock_guard<std::mutex> lock(mu);
 			if(g_handle_store.count(handle)) {
 				return false;
@@ -24,7 +24,7 @@ namespace Actor {
 		}
 
 
-		Service FindService(Handle handle) {
+		std::shared_ptr<MessageQueue> FindService(Handle handle) {
 			std::lock_guard<std::mutex> lock(mu);
 			auto iter = g_handle_store.find(handle);
 			if(iter == g_handle_store.end()) {

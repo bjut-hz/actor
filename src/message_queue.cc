@@ -1,14 +1,21 @@
 #include "message_queue.h"
 
 namespace Actor {
+	GlobalQueue global_queue;
+
+	int32_t GetNewSession() {
+		static std::atomic<int32_t> base{0};
+		base.store(base + 1);
+		return base.load();
+	}
+
 	MessageQueue::MessageQueue(std::shared_ptr<Context> ctx, Handle handle) : ctx_(ctx), handle_(handle) {
 		in_global_ = true;
-		global_queue.Push(shared_from_this());
 	}
 
 	int	MessageQueue::Send(Handle handle, MsgType type, const void* msg, size_t sz) const {
 		auto dst = HandleService::FindService(handle);
-		if(dst == nullptr) {
+		if(dst == nullptr || dst->ctx_ == nullptr) {
 			return -1;
 		}
 
@@ -17,10 +24,22 @@ namespace Actor {
 		message->sz = sz;
 		message->source = handle_;
 		message->session = GetNewSession();
+		message->type = type;
 
 		dst->Push(message);
 
 		return 0;
+	}
+
+	std::shared_ptr<Context> MessageQueue::GetCtx() const {
+		return ctx_;
+	}
+
+	void MessageQueue::Release() {
+		auto msg = Pop();
+		while(msg != nullptr) {
+			Send(msg->source, MsgType::kError, msg->data, msg->sz);
+		}
 	}
 
 	void MessageQueue::Exit() {
@@ -42,7 +61,7 @@ namespace Actor {
 	std::shared_ptr<Message> MessageQueue::Pop() {
 		std::lock_guard<std::mutex> lock(mu_);
 		// double check
-		if(mq_.empty) {
+		if(mq_.empty()) {
 			in_global_ = false;
 			return nullptr;
 		} else {

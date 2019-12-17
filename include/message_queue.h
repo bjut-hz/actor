@@ -4,17 +4,18 @@
 #include <mutex>
 #include <memory>
 #include <queue>
-#include "message.h"
 #include "context.h"
-#include "actor.h"
 
 namespace Actor {	
+	int32_t GetNewSession();
 	class MessageQueue : public std::enable_shared_from_this<MessageQueue> {
 	public:
 		explicit MessageQueue(std::shared_ptr<Context>, Handle);
-		void Push(std::shared_ptr<Message> in);
+		void Push(std::shared_ptr<Message>);
 		std::shared_ptr<Message> Pop();
 		int	Send(Handle, MsgType, const void*, size_t) const;
+		std::shared_ptr<Context> GetCtx() const;
+		void Release();
 		void Exit();
 		DISALLOW_COPY_AND_ASSIGN(MessageQueue);
 	private:
@@ -37,7 +38,6 @@ namespace Actor {
 		std::mutex										mu_;
 	};
 
-	GlobalQueue global_queue;
 } // namespace Actor
 
 

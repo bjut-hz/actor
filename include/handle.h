@@ -5,17 +5,16 @@
 #include <string>
 #include <map>
 #include <atomic>
-#include "actor.h"
-#include "basic.h"
-
+#include <memory>
 namespace Actor {
 	using Handle = uint32_t;
-	
+	class MessageQueue;
+
 	namespace HandleService {
 		Handle NewHandle();
-		bool Register(Handle handle, Service service);
-		Service FindService(Handle handle);
-		void Retire(Handle handle);
+		bool Register(Handle, std::shared_ptr<MessageQueue>);
+		std::shared_ptr<MessageQueue> FindService(Handle);
+		void Retire(Handle);
 	} // namespace HandleService
 } // namespace Actor
 

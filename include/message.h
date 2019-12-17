@@ -2,11 +2,12 @@
 #define MESSAGE_H
 
 #include <memory>
-#include "message_queue.h"
+#include "basic.h"
 #include "handle.h"
 
 namespace Actor {
 	struct Message {
+		MsgType								type;
 		Handle								source;
 		uint32_t							session;
 		const void*							data;

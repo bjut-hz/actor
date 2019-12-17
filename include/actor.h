@@ -1,24 +1,19 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
-#include <string>
 #include <atomic>
-#include "message.h"
-#include "context.h"
-#include "message_queue.h"
+#include "basic.h"
 #include "handle.h"
-namespace Actor {
-	using Service = std::shared_ptr<MessageQueue>;
-	
-	enum class MsgType {
-		kText = 0,
-		kResponse = 1,
-	};
+#include "context.h"
 
-	int32_t GetNewSession();
-	Handle New(CallBack cb);
-	// 
-	void Kill(Handle handle);
+namespace Actor {
+	void Start(int);
+	void Exit();
+
+	Handle NewService(CallBack cb);
+	void KillService(Handle handle);
+
+	int SendMessage(Handle source, Handle dst, MsgType type, const void* msg, size_t sz);
 
 } // namespace Actor
 
