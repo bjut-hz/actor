@@ -2,8 +2,9 @@
 #define BASIC_H
 #include <stdint.h>
 
-
-#define HZ_CHECK_MEMORY_LEAKS
+#ifdef _MSC_VER
+	#define HZ_CHECK_MEMORY_LEAKS
+#endif // _MSC_VER
 
 
 #ifdef HZ_CHECK_MEMORY_LEAKS

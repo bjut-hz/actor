@@ -5,11 +5,20 @@ project(Actor)
 option(ACTOR_BUILD_TESTS "Build Actor's unit tests" ON)
 set(ACTOR_PUBLIC_INCLUDE_DIR "include/")
 
+# This project requires C++11.
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread" )
+
 # 编译器用来寻找include文件的目录
 include_directories (
   "${PROJECT_SOURCE_DIR}/include"
   "${PROJECT_SOURCE_DIR}"
 )
+
+
 
 
 add_library(Actor "")
