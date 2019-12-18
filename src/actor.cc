@@ -78,7 +78,11 @@ namespace Actor {
 						if(nullptr == mq) {
 							std::unique_lock<std::mutex> lock(g_monitor.mu);
 							// todo: add timer thread or socket send message to existing actor
-							g_monitor.cv.wait(lock);
+							
+							// double check
+							if(!g_monitor.quit) {
+								g_monitor.cv.wait(lock);
+							}
 						}
 					}
 				}
